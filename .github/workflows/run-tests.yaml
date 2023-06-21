@@ -30,7 +30,7 @@ jobs:
 
     - name: Set up environment
       run: |
-        echo "API_KEY=${{ env.DB_USER }}" 
+        echo "API_KEY=${{ secrets.DB_USER }}" 
 
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
