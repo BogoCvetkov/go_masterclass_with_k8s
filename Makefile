@@ -7,6 +7,9 @@ db-new-migration:
 db-migrate-up:
 	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${POSTGRESQL_URL}" -verbose up 1
 
+db-migrate-up-linux:
+	migrate -path db/migrations -database "$(POSTGRESQL_URL)" -verbose up
+
 db-migrate-down:
 	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${POSTGRESQL_URL}" -verbose down 1
 

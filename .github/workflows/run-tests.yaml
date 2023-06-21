@@ -24,7 +24,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          
+
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
@@ -42,7 +42,7 @@ jobs:
         which migrate
 
     - name: Run migrations
-      run: make migrateup
+      run: make db-migrate-up-linux
 
     - name: Test
       run: make test
