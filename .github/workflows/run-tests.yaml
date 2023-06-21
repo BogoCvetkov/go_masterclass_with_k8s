@@ -12,21 +12,25 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:14-alpine
-        env:
-          POSTGRES_USER: ${{ env.DB_USER }}
-          POSTGRES_PASSWORD: ${{ env.DB_PASS }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # services:
+    #   postgres:
+    #     image: postgres:14-alpine
+    #     env:
+    #       POSTGRES_USER: ${{ env.DB_USER }}
+    #       POSTGRES_PASSWORD: ${{ env.DB_PASS }}
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
 
     steps:
+
+    - name: Set up environment
+      run: |
+        echo "API_KEY=${{ env.DB_USER }}" 
 
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
@@ -48,4 +52,3 @@ jobs:
 
     - name: Test
       run: make test
-      
