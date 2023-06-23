@@ -17,7 +17,6 @@ db-migrate-up-linux:
 
 db-migrate-down:
 	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${DB_URL}" -verbose down 1
-	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${DB_URL}" -verbose down 1
 
 generate-models: 
 	docker run --rm -v "$(shell echo %cd%):/src" -w /src kjconroy/sqlc generate

@@ -5,7 +5,9 @@ import (
 )
 
 type ControllerMap struct {
-	Account *accController
+	Account  *accController
+	Transfer *transferController
+	User     *userController
 }
 
 // Initialize Controllers
@@ -18,6 +20,12 @@ func InitControllers(s *db.Store) *ControllerMap {
 
 	controllerMap = &ControllerMap{
 		Account: &accController{
+			apiController: baseCtr,
+		},
+		Transfer: &transferController{
+			apiController: baseCtr,
+		},
+		User: &userController{
 			apiController: baseCtr,
 		},
 	}

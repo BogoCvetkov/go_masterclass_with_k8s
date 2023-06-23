@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/BogoCvetkov/go_mastercalss/controller"
+	"github.com/BogoCvetkov/go_mastercalss/middleware"
 )
 
 func (s *Server) AttachRoutes() {
@@ -11,8 +12,29 @@ func (s *Server) AttachRoutes() {
 	api := s.router.Group("/api")
 
 	{
-		api.GET("/account", ctr.Account.ListAccounts)
-		api.GET("/account/:id", ctr.Account.GetAccount)
-		api.POST("/account", ctr.Account.CreateAccount)
+		acc := api.Group("/account")
+		{
+			acc.GET("", ctr.Account.ListAccounts)
+			acc.GET("/:id", ctr.Account.GetAccount)
+			acc.POST("", ctr.Account.CreateAccount)
+		}
+
+		tr := api.Group("/transfer")
+		{
+
+			tr.POST("", ctr.Transfer.CreateTransfer)
+		}
+
+		u := api.Group("/user")
+		{
+
+			u.POST("", ctr.User.CreateUser)
+			u.POST("login", ctr.User.LoginUser)
+		}
 	}
+}
+
+func (s *Server) AttachGlobalMiddlewares() {
+	// Handle errors globaly
+	s.router.Use(middleware.ErrorMiddleware)
 }

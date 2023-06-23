@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/BogoCvetkov/go_mastercalss/api"
+	validator "github.com/BogoCvetkov/go_mastercalss/controller/validators"
 	"github.com/BogoCvetkov/go_mastercalss/db"
 	_ "github.com/lib/pq"
 )
@@ -26,8 +27,14 @@ func main() {
 	// Initialize new server
 	server := api.NewServer(store)
 
+	// Attach middlewares used everywhere
+	server.AttachGlobalMiddlewares()
+
 	// Attach route
 	server.AttachRoutes()
+
+	// Init custom validators
+	validator.RegisterValidation()
 
 	// Start listening
 	server.Start(config.Port)

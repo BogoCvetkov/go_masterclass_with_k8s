@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
@@ -29,6 +30,17 @@ func (s *Store) TransferTrx(ctx context.Context, data db.CreateTransferParams) (
 	defer tx.Rollback()
 
 	qtx := s.WithTx(tx)
+
+	// Check if sender has enough balance
+	from, err := qtx.GetAccountForUpdate(ctx, data.FromAccountID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	if from.Balance < data.Amount {
+		return nil, errors.New("not enough balance for transfer")
+	}
 
 	// Save transfer info
 	result.Transfer, err = qtx.CreateTransfer(ctx, data)

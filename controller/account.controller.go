@@ -7,6 +7,7 @@ import (
 
 	controller "github.com/BogoCvetkov/go_mastercalss/controller/types"
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
+	m "github.com/BogoCvetkov/go_mastercalss/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,19 +19,30 @@ func (ctr *accController) CreateAccount(c *gin.Context) {
 	var data controller.CreateAccountParams
 
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		m.HandleErr(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	owner, err := ctr.store.GetUser(c, data.Owner)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			m.HandleErr(c, "Owner not found", http.StatusNotFound)
+			return
+		}
+
+		m.HandleErr(c, "Failed to create account", http.StatusBadRequest)
 		return
 	}
 
 	document := db.CreateAccountParams{
-		Owner:    data.Owner,
+		Owner:    owner.ID,
 		Currency: data.Currency,
 		Balance:  0,
 	}
 
 	acc, err := ctr.store.CreateAccount(c, document)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		m.HandleErr(c, "Failed to create account", http.StatusBadRequest)
 		return
 	}
 
@@ -43,18 +55,18 @@ func (ctr *accController) GetAccount(c *gin.Context) {
 
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		m.HandleErr(c, "Id not an integer", http.StatusBadRequest)
 		return
 	}
 
 	acc, err := ctr.store.GetAccount(c, int64(id))
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			m.HandleErr(c, "Account not found", http.StatusNotFound)
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		m.HandleErr(c, "Failed to get account", http.StatusBadRequest)
 		return
 	}
 
@@ -66,7 +78,7 @@ func (ctr *accController) ListAccounts(c *gin.Context) {
 	var q controller.ListAccountQuery
 
 	if err := c.ShouldBindQuery(&q); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		m.HandleErr(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -78,11 +90,11 @@ func (ctr *accController) ListAccounts(c *gin.Context) {
 	acc, err := ctr.store.ListAccounts(c, query)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			m.HandleErr(c, "No accounts found", http.StatusNotFound)
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		m.HandleErr(c, "Failed to get account", http.StatusBadRequest)
 		return
 	}
 
