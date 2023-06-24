@@ -1,10 +1,12 @@
-package controller
+package api
 
 import (
 	"database/sql"
 	"net/http"
 
-	controller "github.com/BogoCvetkov/go_mastercalss/controller/types"
+	controller "github.com/BogoCvetkov/go_mastercalss/api/controller/types"
+	"github.com/BogoCvetkov/go_mastercalss/auth"
+
 	db_util "github.com/BogoCvetkov/go_mastercalss/db"
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	m "github.com/BogoCvetkov/go_mastercalss/middleware"
@@ -40,7 +42,7 @@ func (ctr *userController) CreateUser(c *gin.Context) {
 	}
 
 	// Create new user
-	user, err := ctr.store.CreateUser(c, document)
+	user, err := ctr.server.GetStore().CreateUser(c, document)
 	if err != nil {
 
 		if db_util.ErrorCode(err) == db_util.UniqueViolation {
@@ -68,7 +70,7 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 	}
 
 	// Find user
-	user, err := ctr.store.GetUser(c, data.Email)
+	user, err := ctr.server.GetStore().GetUser(c, data.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			m.HandleErr(c, "User not found", http.StatusNotFound)
@@ -86,7 +88,23 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"msg": "Login Success"})
+	// Prepare access token payload
+	p, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().TokenDuration)
+	if err != nil {
+		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
+		return
+	}
+
+	// Generate access token
+	token, err := ctr.server.GetAuth().GenerateToken(p)
+	if err != nil {
+		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
+		return
+	}
+
+	filtered := filterUser(&user)
+
+	c.JSON(http.StatusOK, gin.H{"token": token, "user": filtered})
 }
 
 func filterUser(u *db.User) *controller.CreateUserReponse {

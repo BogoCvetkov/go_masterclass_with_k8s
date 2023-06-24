@@ -1,11 +1,11 @@
-package controller
+package api
 
 import (
 	"database/sql"
 	"net/http"
 	"strconv"
 
-	controller "github.com/BogoCvetkov/go_mastercalss/controller/types"
+	controller "github.com/BogoCvetkov/go_mastercalss/api/controller/types"
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	m "github.com/BogoCvetkov/go_mastercalss/middleware"
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func (ctr *accController) CreateAccount(c *gin.Context) {
 		return
 	}
 
-	owner, err := ctr.store.GetUser(c, data.Owner)
+	owner, err := ctr.server.GetStore().GetUser(c, data.Owner)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			m.HandleErr(c, "Owner not found", http.StatusNotFound)
@@ -40,7 +40,7 @@ func (ctr *accController) CreateAccount(c *gin.Context) {
 		Balance:  0,
 	}
 
-	acc, err := ctr.store.CreateAccount(c, document)
+	acc, err := ctr.server.GetStore().CreateAccount(c, document)
 	if err != nil {
 		m.HandleErr(c, "Failed to create account", http.StatusBadRequest)
 		return
@@ -59,7 +59,7 @@ func (ctr *accController) GetAccount(c *gin.Context) {
 		return
 	}
 
-	acc, err := ctr.store.GetAccount(c, int64(id))
+	acc, err := ctr.server.GetStore().GetAccount(c, int64(id))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			m.HandleErr(c, "Account not found", http.StatusNotFound)
@@ -87,7 +87,7 @@ func (ctr *accController) ListAccounts(c *gin.Context) {
 		Offset: (q.Page - 1) * q.Limit,
 	}
 
-	acc, err := ctr.store.ListAccounts(c, query)
+	acc, err := ctr.server.GetStore().ListAccounts(c, query)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			m.HandleErr(c, "No accounts found", http.StatusNotFound)

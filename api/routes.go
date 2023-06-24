@@ -1,37 +1,49 @@
 package api
 
 import (
-	"github.com/BogoCvetkov/go_mastercalss/controller"
+	api "github.com/BogoCvetkov/go_mastercalss/api/controller"
 	"github.com/BogoCvetkov/go_mastercalss/middleware"
 )
 
 func (s *Server) AttachRoutes() {
 
-	ctr := controller.InitControllers(s.Store)
+	ctr := api.InitControllers(s)
 
 	api := s.router.Group("/api")
 
+	// Public routes
 	{
-		acc := api.Group("/account")
+		public := api.Group("")
+
+		u := public.Group("/user")
+		{
+
+			u.POST("", ctr.User.CreateUser)
+			u.POST("login", ctr.User.LoginUser)
+		}
+
+	}
+
+	// Authenticated routes
+	{
+		protected := api.Group("")
+		protected.Use(middleware.AuthMiddleware(s.auth, s.store))
+
+		acc := protected.Group("/account")
 		{
 			acc.GET("", ctr.Account.ListAccounts)
 			acc.GET("/:id", ctr.Account.GetAccount)
 			acc.POST("", ctr.Account.CreateAccount)
 		}
 
-		tr := api.Group("/transfer")
+		tr := protected.Group("/transfer")
 		{
 
 			tr.POST("", ctr.Transfer.CreateTransfer)
 		}
 
-		u := api.Group("/user")
-		{
-
-			u.POST("", ctr.User.CreateUser)
-			u.POST("login", ctr.User.LoginUser)
-		}
 	}
+
 }
 
 func (s *Server) AttachGlobalMiddlewares() {

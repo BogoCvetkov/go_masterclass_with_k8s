@@ -1,7 +1,7 @@
-package controller
+package api
 
 import (
-	"github.com/BogoCvetkov/go_mastercalss/db"
+	"github.com/BogoCvetkov/go_mastercalss/interfaces"
 )
 
 type ControllerMap struct {
@@ -11,11 +11,11 @@ type ControllerMap struct {
 }
 
 // Initialize Controllers
-func InitControllers(s *db.Store) *ControllerMap {
+func InitControllers(s interfaces.IServer) *ControllerMap {
 	var controllerMap *ControllerMap
 
 	baseCtr := &apiController{
-		store: s,
+		server: s,
 	}
 
 	controllerMap = &ControllerMap{

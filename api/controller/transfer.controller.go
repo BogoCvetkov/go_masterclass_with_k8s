@@ -1,11 +1,11 @@
-package controller
+package api
 
 import (
 	"database/sql"
 	"fmt"
 	"net/http"
 
-	controller "github.com/BogoCvetkov/go_mastercalss/controller/types"
+	controller "github.com/BogoCvetkov/go_mastercalss/api/controller/types"
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	m "github.com/BogoCvetkov/go_mastercalss/middleware"
 	"github.com/gin-gonic/gin"
@@ -37,7 +37,7 @@ func (ctr *transferController) CreateTransfer(c *gin.Context) {
 		Amount:        data.Amount,
 	}
 
-	result, err := ctr.store.TransferTrx(c, document)
+	result, err := ctr.server.GetStore().TransferTrx(c, document)
 	if err != nil {
 		m.HandleErr(c, err.Error(), http.StatusBadRequest)
 		return
@@ -47,7 +47,7 @@ func (ctr *transferController) CreateTransfer(c *gin.Context) {
 }
 
 func (ctr *transferController) validAccount(c *gin.Context, accountID int64, currency string) bool {
-	account, err := ctr.store.GetAccount(c, accountID)
+	account, err := ctr.server.GetStore().GetAccount(c, accountID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			m.HandleErr(c, "Account not found", http.StatusNotFound)
