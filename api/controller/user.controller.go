@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"net/http"
+	"time"
 
 	controller "github.com/BogoCvetkov/go_mastercalss/api/controller/types"
 	"github.com/BogoCvetkov/go_mastercalss/auth"
@@ -89,7 +90,99 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 	}
 
 	// Prepare access token payload
-	p, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().TokenDuration)
+	p1, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().TokenDuration)
+	if err != nil {
+		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
+		return
+	}
+
+	// Generate access token
+	token, err := ctr.server.GetAuth().GenerateToken(p1)
+	if err != nil {
+		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
+		return
+	}
+
+	// Prepare REFRESH token payload
+	p2, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().RTokenDuration)
+	if err != nil {
+		m.HandleErr(c, "Failed generating refresh token", http.StatusBadRequest)
+		return
+	}
+
+	// Generate REFRESH token
+	rtoken, err := ctr.server.GetAuth().GenerateToken(p2)
+	if err != nil {
+		m.HandleErr(c, "Failed generating refresh token", http.StatusBadRequest)
+		return
+	}
+
+	// Store session
+	arg := db.CreateSessionParams{
+		ID:           p2.TokenID,
+		UserID:       user.ID,
+		RefreshToken: rtoken,
+		UserAgent:    c.Request.UserAgent(),
+		ClientIp:     c.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    p2.ExpiresAt.Time,
+	}
+	_, err = ctr.server.GetStore().CreateSession(c, arg)
+	if err != nil {
+		m.HandleErr(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	filtered := filterUser(&user)
+
+	c.JSON(http.StatusOK, gin.H{"token": token, "refresh_token": rtoken, "user": filtered})
+}
+
+func (ctr *userController) RefreshToken(c *gin.Context) {
+	var data controller.RefreshTokenParams
+
+	// Validate data
+	if err := c.ShouldBindJSON(&data); err != nil {
+		m.HandleErr(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Verify refresh token
+	payload, err := ctr.server.GetAuth().VerifyToken(data.Token)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": err.Error()})
+		return
+	}
+
+	// Check user session data
+	session, err := ctr.server.GetStore().GetSession(c, payload.TokenID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid token"})
+			return
+		}
+
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "authorization failed"})
+		return
+	}
+
+	if payload.UserID != session.UserID || data.Token != session.RefreshToken {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid token"})
+		return
+	}
+
+	if session.IsBlocked {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid token"})
+		return
+	}
+
+	if time.Now().After(session.ExpiresAt) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "expired token"})
+		return
+	}
+
+	// Prepare access token payload
+	p, err := auth.NewTokenPayload(payload.UserID, ctr.server.GetConfig().TokenDuration)
 	if err != nil {
 		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
 		return
@@ -102,9 +195,8 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 		return
 	}
 
-	filtered := filterUser(&user)
+	c.JSON(http.StatusOK, gin.H{"token": token})
 
-	c.JSON(http.StatusOK, gin.H{"token": token, "user": filtered})
 }
 
 func filterUser(u *db.User) *controller.CreateUserReponse {

@@ -20,6 +20,7 @@ func (s *Server) AttachRoutes() {
 
 			u.POST("", ctr.User.CreateUser)
 			u.POST("login", ctr.User.LoginUser)
+			u.POST("refresh-token", ctr.User.RefreshToken)
 		}
 
 	}

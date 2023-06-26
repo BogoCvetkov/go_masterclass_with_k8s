@@ -8,11 +8,12 @@ import (
 )
 
 type Config struct {
-	DB            string        `mapstructure:"DB_URL"`
-	DBDriver      string        `mapstructure:"DB_DRIVER"`
-	Port          string        `mapstructure:"PORT"`
-	TokenDuration time.Duration `mapstructure:"TOKEN_DURATION"`
-	TokenSecret   string        `mapstructure:"TOKEN_SECRET"`
+	DB             string        `mapstructure:"DB_URL"`
+	DBDriver       string        `mapstructure:"DB_DRIVER"`
+	Port           string        `mapstructure:"PORT"`
+	TokenDuration  time.Duration `mapstructure:"TOKEN_DURATION"`
+	TokenSecret    string        `mapstructure:"TOKEN_SECRET"`
+	RTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 func LoadConfig() *Config {
