@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/BogoCvetkov/go_mastercalss/db"
+	models "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	"github.com/BogoCvetkov/go_mastercalss/interfaces"
 	"github.com/gin-gonic/gin"
 )
@@ -59,4 +60,12 @@ func AuthMiddleware(a interfaces.IAuth, s *db.Store) gin.HandlerFunc {
 		c.Next()
 	}
 
+}
+
+func GetReqUser(c *gin.Context) *models.User {
+
+	user, _ := c.Get("user")
+	result, _ := user.(models.User)
+
+	return &result
 }

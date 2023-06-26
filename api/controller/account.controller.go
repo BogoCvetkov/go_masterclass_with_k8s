@@ -23,19 +23,10 @@ func (ctr *accController) CreateAccount(c *gin.Context) {
 		return
 	}
 
-	owner, err := ctr.server.GetStore().GetUser(c, data.Owner)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			m.HandleErr(c, "Owner not found", http.StatusNotFound)
-			return
-		}
-
-		m.HandleErr(c, "Failed to create account", http.StatusBadRequest)
-		return
-	}
+	reqU := m.GetReqUser(c)
 
 	document := db.CreateAccountParams{
-		Owner:    owner.ID,
+		Owner:    reqU.ID,
 		Currency: data.Currency,
 		Balance:  0,
 	}
@@ -82,7 +73,10 @@ func (ctr *accController) ListAccounts(c *gin.Context) {
 		return
 	}
 
+	reqU := m.GetReqUser(c)
+
 	query := db.ListAccountsParams{
+		Owner:  reqU.ID,
 		Limit:  q.Limit,
 		Offset: (q.Page - 1) * q.Limit,
 	}

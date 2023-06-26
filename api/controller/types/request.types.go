@@ -5,7 +5,6 @@ import "time"
 // Account
 
 type CreateAccountParams struct {
-	Owner    string `json:"owner" binding:"required,alpha"`
 	Currency string `json:"currency" binding:"required,validcurrency"`
 }
 
