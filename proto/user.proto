@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+option go_package = "github.com/BogoCvetkov/go_mastercalss/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+
+
+message User {
+    int64 id = 1;
+    string username = 2;
+    string full_name = 3;
+    string email = 4;
+    google.protobuf.Timestamp pass_changed_at = 5;
+    google.protobuf.Timestamp created_at = 6;
+}
+
+// Create
+message CreateUserReq {
+    string username  = 1;
+	string password  = 2;
+	string full_name  = 3;
+	string email     = 4;
+}
+message CreateUserRes {
+    User user = 1;
+}
+
+// Login
+message LoginUserReq {
+    string password = 1;
+    string email = 2;
+}
+message LoginUserRes {
+    string token = 1;
+    string refresh_token = 2;
+    User user = 3;
+}
+
+// Refresh Token
+message RefreshTokenReq  {
+	string token = 1;
+}
+
+message RefreshTokenRes {
+    string token = 1;
+}
+
+
+service UserService {
+    rpc CreateUser(CreateUserReq) returns (CreateUserRes) {
+        option (google.api.http) = {
+            post: "/user"
+            body: "*"
+        };
+    };
+    rpc LoginUser(LoginUserReq) returns (LoginUserRes) {
+        option (google.api.http) = {
+            post: "/user/login"
+            body: "*"
+        };
+    };
+    rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes) {
+        option (google.api.http) = {
+            post: "/user/verify-token"
+            body: "*"
+        };
+    };
+}

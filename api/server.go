@@ -32,7 +32,7 @@ func NewServer(s *db.Store, c *config.Config) *Server {
 }
 
 func (s *Server) Start(p string) {
-	fmt.Printf("Starting server on port --> %s", p)
+	fmt.Printf("Starting server on port --> %s \n", p)
 
 	port := fmt.Sprintf(":%s", p)
 

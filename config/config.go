@@ -8,19 +8,25 @@ import (
 )
 
 type Config struct {
-	DB             string        `mapstructure:"DB_URL"`
-	DBDriver       string        `mapstructure:"DB_DRIVER"`
-	Port           string        `mapstructure:"PORT"`
-	TokenDuration  time.Duration `mapstructure:"TOKEN_DURATION"`
-	TokenSecret    string        `mapstructure:"TOKEN_SECRET"`
-	RTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+	DB              string        `mapstructure:"DB_URL"`
+	DBDriver        string        `mapstructure:"DB_DRIVER"`
+	Port            string        `mapstructure:"PORT"`
+	GRPCPort        string        `mapstructure:"GRPC_PORT"`
+	GRPCGatewayPort string        `mapstructure:"GRPC_GATEWAY_PORT"`
+	Env             string        `mapstructure:"ENV"`
+	TokenDuration   time.Duration `mapstructure:"TOKEN_DURATION"`
+	TokenSecret     string        `mapstructure:"TOKEN_SECRET"`
+	RTokenDuration  time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 func LoadConfig() *Config {
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 
+	viper.SetDefault("Env", "DEV")
 	viper.SetDefault("Port", "8080")
+	viper.SetDefault("GRPCPort", "9000")
+	viper.SetDefault("GRPCGatewayPort", "5000")
 
 	duration, err := time.ParseDuration("30m")
 	if err != nil {

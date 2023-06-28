@@ -8,6 +8,7 @@ import (
 	validator "github.com/BogoCvetkov/go_mastercalss/api/controller/validators"
 	"github.com/BogoCvetkov/go_mastercalss/config"
 	"github.com/BogoCvetkov/go_mastercalss/db"
+	g "github.com/BogoCvetkov/go_mastercalss/grpc"
 	_ "github.com/lib/pq"
 )
 
@@ -36,6 +37,13 @@ func main() {
 
 	// Init custom validators
 	validator.RegisterValidation()
+
+	// Init GRP server in parallel
+	gserver := g.NewServer(store, config)
+	go gserver.Start(config.GRPCPort)
+
+	// GRPC gateway
+	go gserver.StartHttpGateway(config.GRPCGatewayPort)
 
 	// Start listening
 	server.Start(config.Port)
