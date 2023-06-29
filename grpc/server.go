@@ -12,7 +12,9 @@ import (
 	"github.com/BogoCvetkov/go_mastercalss/db"
 	grpc_server "github.com/BogoCvetkov/go_mastercalss/grpc/services"
 	"github.com/BogoCvetkov/go_mastercalss/interfaces"
+	_ "github.com/BogoCvetkov/go_mastercalss/statik"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -91,7 +93,11 @@ func (g *GRPCServer) StartHttpGateway(p string) {
 	mux.Handle("/", gwmux)
 
 	// Add Swagger
-	fs := http.FileServer(http.Dir("./swagger"))
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fs := http.FileServer(statikFS)
 	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
 
 	port := fmt.Sprintf(":%s", p)

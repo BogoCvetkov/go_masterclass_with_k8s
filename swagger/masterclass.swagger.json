@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "GRPC Gateway API",
-    "version": "1.2",
+    "version": "1.0",
     "contact": {
       "name": "Bogo Tsvetkov",
       "url": "https://www.linkedin.com/in/bogomil-cvetkov-766a37b5/",
@@ -174,7 +174,7 @@
       "description": "Login params",
       "title": "Login User",
       "required": [
-        "username",
+        "email",
         "password"
       ]
     },
