@@ -111,15 +111,18 @@ func (s *UserService) LoginUser(c context.Context, data *pb.LoginUserReq) (*pb.L
 		return nil, status.Errorf(codes.Internal, "Failed generating refresh token")
 	}
 
+	// Get Metadata
+	md := util.ExtractMetaData(c)
+
 	// Store session
 	arg := gen.CreateSessionParams{
 		ID:           p2.TokenID,
 		UserID:       user.ID,
 		RefreshToken: rtoken,
-		// UserAgent:    c.Request.UserAgent(),
-		// ClientIp:     c.ClientIP(),
-		IsBlocked: false,
-		ExpiresAt: p2.ExpiresAt.Time,
+		UserAgent:    md.UserAgent,
+		ClientIp:     md.ClientIp,
+		IsBlocked:    false,
+		ExpiresAt:    p2.ExpiresAt.Time,
 	}
 
 	_, err = s.server.GetStore().CreateSession(c, arg)

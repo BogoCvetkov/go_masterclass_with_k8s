@@ -90,6 +90,10 @@ func (g *GRPCServer) StartHttpGateway(p string) {
 	mux := http.NewServeMux()
 	mux.Handle("/", gwmux)
 
+	// Add Swagger
+	fs := http.FileServer(http.Dir("./swagger"))
+	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+
 	port := fmt.Sprintf(":%s", p)
 
 	listener, err := net.Listen("tcp", port)

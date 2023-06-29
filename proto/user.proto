@@ -4,9 +4,31 @@ option go_package = "github.com/BogoCvetkov/go_mastercalss/pb";
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "GRPC Gateway API";
+        version: "1.0";
+        contact: {
+            name: "Bogo Tsvetkov";
+            url: "https://www.linkedin.com/in/bogomil-cvetkov-766a37b5/";
+            email: "cvetkov.bogomil@gmail.com";
+        };
+    };
+};
 
 
 message User {
+    // Swagger
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "User type"
+            description: "Platform user type"
+        }
+
+    };
+
     int64 id = 1;
     string username = 2;
     string full_name = 3;
@@ -17,6 +39,16 @@ message User {
 
 // Create
 message CreateUserReq {
+    // Swagger
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Create User"
+            description: "Register user params"
+            required: ["username", "password", "full_name","email"]
+        }
+
+    };
+
     string username  = 1;
 	string password  = 2;
 	string full_name  = 3;
@@ -28,6 +60,16 @@ message CreateUserRes {
 
 // Login
 message LoginUserReq {
+    // Swagger
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Login User"
+            description: "Login params"
+            required: ["email", "password"]
+        }
+
+    };
+    
     string password = 1;
     string email = 2;
 }
@@ -39,6 +81,16 @@ message LoginUserRes {
 
 // Refresh Token
 message RefreshTokenReq  {
+     // Swagger
+     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Refresh token"
+            description: "Refresh token params"
+            required: ["token"]
+        }
+
+    };
+
 	string token = 1;
 }
 
@@ -53,17 +105,35 @@ service UserService {
             post: "/user"
             body: "*"
         };
+
+        // Swagger
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Register User Ednpoint"
+            summary: "Use this endpoint to create new user in the system"
+        };
     };
+
     rpc LoginUser(LoginUserReq) returns (LoginUserRes) {
         option (google.api.http) = {
             post: "/user/login"
             body: "*"
         };
+         // Swagger
+         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Login"
+            summary: "Use this endpoint to generate short-lived access and long-lived refresh token"
+        };
     };
+
     rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes) {
         option (google.api.http) = {
             post: "/user/verify-token"
             body: "*"
+        };
+         // Swagger
+         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Refresh access token"
+            summary: "Use this endpoint to issue a new access-token using the provided refresh token in /login route"
         };
     };
 }
