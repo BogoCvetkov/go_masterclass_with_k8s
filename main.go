@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"log"
+	"os"
 
 	"github.com/BogoCvetkov/go_mastercalss/api"
 	validator "github.com/BogoCvetkov/go_mastercalss/api/controller/validators"
@@ -10,6 +10,8 @@ import (
 	"github.com/BogoCvetkov/go_mastercalss/db"
 	g "github.com/BogoCvetkov/go_mastercalss/grpc"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -17,11 +19,16 @@ func main() {
 	// Load Config
 	config := config.LoadConfig()
 
+	// Config logger
+	if config.Env == "DEV" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+
 	// Initialize DB connection and Store
 	conn, err := sql.Open(config.DBDriver, config.DB)
 
 	if err != nil {
-		log.Fatal("Failed connecting to DB", err)
+		log.Fatal().Err(err).Msg("Failed connecting to DB")
 	}
 
 	store := db.NewStore(conn)

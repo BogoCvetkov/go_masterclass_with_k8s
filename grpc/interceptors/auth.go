@@ -9,10 +9,35 @@ import (
 	"github.com/BogoCvetkov/go_mastercalss/db"
 	models "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	"github.com/BogoCvetkov/go_mastercalss/interfaces"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-func AuthenticateUser(c context.Context, a interfaces.IAuth, s *db.Store) (*models.User, error) {
+func (m *InterceptorManager) NewAuthInterceptor() grpc.UnaryServerInterceptor {
+
+	return func(c context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+
+		//Check if method requires authentication
+		isAuth := authMap[info.FullMethod]
+
+		if isAuth {
+			// Authenticate user
+			user, err := authenticateUser(c, m.server.GetAuth(), m.server.GetStore())
+			if err != nil {
+				return nil, err
+			}
+
+			// Attach to context
+			c = context.WithValue(c, "user", user)
+		}
+
+		// Proceed with the request handling
+		return handler(c, req)
+	}
+
+}
+
+func authenticateUser(c context.Context, a interfaces.IAuth, s *db.Store) (*models.User, error) {
 	var authHeader string
 
 	md, ok := metadata.FromIncomingContext(c)

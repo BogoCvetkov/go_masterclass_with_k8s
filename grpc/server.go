@@ -10,6 +10,7 @@ import (
 	"github.com/BogoCvetkov/go_mastercalss/auth"
 	"github.com/BogoCvetkov/go_mastercalss/config"
 	"github.com/BogoCvetkov/go_mastercalss/db"
+	interceptors "github.com/BogoCvetkov/go_mastercalss/grpc/interceptors"
 	grpc_server "github.com/BogoCvetkov/go_mastercalss/grpc/services"
 	"github.com/BogoCvetkov/go_mastercalss/interfaces"
 	_ "github.com/BogoCvetkov/go_mastercalss/statik"
@@ -53,7 +54,14 @@ func (g *GRPCServer) Start(p string) {
 		log.Panic(err)
 	}
 
-	g.srv = grpc.NewServer()
+	// Init interceptors
+	interceptManager := interceptors.InterceptorManager{}
+	interceptManager.PassServerConfig(g)
+
+	g.srv = grpc.NewServer(
+		grpc.ChainUnaryInterceptor(interceptManager.NewLoggerInterceptor(), interceptManager.NewAuthInterceptor()),
+	)
+
 	// Enable reflection
 	if g.config.Env == "DEV" {
 		reflection.Register(g.srv)
