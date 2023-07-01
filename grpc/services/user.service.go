@@ -40,6 +40,11 @@ func (s *UserService) RegisterServiceOnGateway(c context.Context, mux *runtime.S
 }
 
 func (s *UserService) CreateUser(c context.Context, data *pb.CreateUserReq) (*pb.CreateUserRes, error) {
+	// _, err := gauth.AuthenticateUser(c, s.server.GetAuth(), s.server.GetStore())
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.Unauthenticated, "VEY BADDDDD")
+	// }
+
 	// Encrypt password
 	hash, err := util.HashPassword(data.Password)
 	if err != nil {
