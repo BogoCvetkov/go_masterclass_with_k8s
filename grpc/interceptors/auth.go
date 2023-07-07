@@ -84,3 +84,11 @@ func authenticateUser(c context.Context, a interfaces.IAuth, s *db.Store) (*mode
 
 	return &user, nil
 }
+
+func GetReqUser(c context.Context) *models.User {
+
+	user := c.Value("user")
+	result, _ := user.(*models.User)
+
+	return result
+}

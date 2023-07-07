@@ -7,9 +7,12 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/BogoCvetkov/go_mastercalss/auth"
 	"github.com/BogoCvetkov/go_mastercalss/config"
 	"github.com/BogoCvetkov/go_mastercalss/db"
+	middleware "github.com/BogoCvetkov/go_mastercalss/grpc/gateway"
 	interceptors "github.com/BogoCvetkov/go_mastercalss/grpc/interceptors"
 	grpc_server "github.com/BogoCvetkov/go_mastercalss/grpc/services"
 	"github.com/BogoCvetkov/go_mastercalss/interfaces"
@@ -39,6 +42,8 @@ func NewServer(s *db.Store, c *config.Config) *GRPCServer {
 		auth:   a,
 		services: []interfaces.IGService{
 			&grpc_server.UserService{},
+			&grpc_server.AccountService{},
+			&grpc_server.TransferService{},
 		},
 	}
 }
@@ -97,8 +102,13 @@ func (g *GRPCServer) StartHttpGateway(p string) {
 		log.Fatalf("cannot register Gateway handler server")
 	}
 
-	mux := http.NewServeMux()
-	mux.Handle("/", gwmux)
+	// Create router
+	router := mux.NewRouter()
+
+	// Apply auth middleware to specific routes
+	router.PathPrefix("/account").Handler(middleware.AuthMiddleware(gwmux, g.GetAuth(), g.GetStore()))
+	router.PathPrefix("/account/{id}").Handler(middleware.AuthMiddleware(gwmux, g.GetAuth(), g.GetStore()))
+	router.PathPrefix("/transfer").Handler(middleware.AuthMiddleware(gwmux, g.GetAuth(), g.GetStore()))
 
 	// Add Swagger
 	statikFS, err := fs.New()
@@ -106,8 +116,12 @@ func (g *GRPCServer) StartHttpGateway(p string) {
 		log.Fatal(err)
 	}
 	fs := http.FileServer(statikFS)
-	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+	router.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", fs))
 
+	// Set the gwmux as the default handler for other routes
+	router.PathPrefix("/").Handler(gwmux)
+
+	// Start Listening
 	port := fmt.Sprintf(":%s", p)
 
 	listener, err := net.Listen("tcp", port)
@@ -117,7 +131,7 @@ func (g *GRPCServer) StartHttpGateway(p string) {
 
 	fmt.Printf("Starting GRPC Gateway server on port --> %s \n", p)
 
-	err = http.Serve(listener, mux)
+	err = http.Serve(listener, router)
 	if err != nil {
 		log.Fatalf("cannot start GRPC Gateway")
 	}

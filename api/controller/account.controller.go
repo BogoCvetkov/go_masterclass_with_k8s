@@ -44,13 +44,20 @@ func (ctr *accController) GetAccount(c *gin.Context) {
 
 	param := c.Param("id")
 
+	reqU := m.GetReqUser(c)
+
 	id, err := strconv.Atoi(param)
 	if err != nil {
 		m.HandleErr(c, "Id not an integer", http.StatusBadRequest)
 		return
 	}
 
-	acc, err := ctr.server.GetStore().GetAccount(c, int64(id))
+	params := db.GetAccountByOwnerParams{
+		ID:    int64(id),
+		Owner: reqU.ID,
+	}
+
+	acc, err := ctr.server.GetStore().GetAccountByOwner(c, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			m.HandleErr(c, "Account not found", http.StatusNotFound)
@@ -88,7 +95,7 @@ func (ctr *accController) ListAccounts(c *gin.Context) {
 			return
 		}
 
-		m.HandleErr(c, "Failed to get account", http.StatusBadRequest)
+		m.HandleErr(c, "Failed to get accounts", http.StatusBadRequest)
 		return
 	}
 

@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+option go_package = "github.com/BogoCvetkov/go_mastercalss/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+message Transfer  {
+    // Swagger
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Transfer type"
+            description: "Transfer between two accounts"
+        }
+
+    }; 
+
+	int64 id = 1;       
+	int64 from_account_id = 2;
+	int64 to_account_id = 3;        
+	int64 amount = 4;    
+	google.protobuf.Timestamp  created_at = 5;
+}
+
+// Create
+message CreateTransferReq  {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Create New Transfer"
+            description: "Transfer money between accounts"
+            required: ["from_account_id", "to_account_id", "amount","currency"]
+        }
+
+    };
+
+
+	int64 from_account_id = 1;
+	int64 to_account_id = 2;
+	int64 amount = 3;
+	string currency = 4;
+}
+message CreateTransferRes {
+	Transfer transfer = 1;
+}
+
+service TransferService {
+    rpc CreateTransfer(CreateTransferReq) returns (CreateTransferRes) {
+        option (google.api.http) = {
+            post: "/transfer"
+            body: "*"
+        };
+
+        // Swagger
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Transfer Money Endpoint"
+            summary: "Use this endpoint to transfer money between a logged user account and another account"
+        };
+    };
+}

@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+option go_package = "github.com/BogoCvetkov/go_mastercalss/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+message Account  {
+    // Swagger
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Account type"
+            description: "User bank account type"
+        }
+
+    }; 
+
+	int64 id = 1;       
+	int64 owner = 2;
+	int64 balance = 3;        
+	string currency = 4;    
+	google.protobuf.Timestamp  created_at = 5;
+}
+
+// Create
+message CreateAccountReq  {
+	string currency = 1;
+}
+message CreateAccountRes {
+	Account account = 1;
+}
+
+// List user accounts
+message ListAccountReq {
+	int32 page = 1;
+	int32 limit = 2;
+}
+message ListAccountRes {
+	repeated Account accounts = 1;
+}
+
+// Get user account
+message GetAccountReq {
+	int64 id = 1;
+}
+message GetAccountRes {
+	Account account = 1;
+}
+
+
+
+service AccountService {
+
+    rpc CreateAccount(CreateAccountReq) returns (CreateAccountRes) {
+        option (google.api.http) = {
+            post: "/account"
+            body: "*"
+        };
+         // Swagger
+         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create a new bank account for a logged user"
+            summary: "Use this endpoint to create a new bank account in a particular currency for an user"
+        };
+    };
+
+    rpc ListAccounts(ListAccountReq) returns (ListAccountRes) {
+        option (google.api.http) = {
+            get: "/account"
+        };
+         // Swagger
+         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "List all accounts of a logged user"
+            summary: "List all accounts of a logged user"
+        };
+    };
+
+    rpc GetAccount(GetAccountReq) returns (GetAccountRes) {
+        option (google.api.http) = {
+            get: "/account/{id}"
+        };
+         // Swagger
+         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "List logged user account"
+            summary: "List logged user account"
+        };
+    };
+
+}

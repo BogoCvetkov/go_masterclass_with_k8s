@@ -12,6 +12,12 @@
   "tags": [
     {
       "name": "UserService"
+    },
+    {
+      "name": "AccountService"
+    },
+    {
+      "name": "TransferService"
     }
   ],
   "consumes": [
@@ -21,6 +27,146 @@
     "application/json"
   ],
   "paths": {
+    "/account": {
+      "get": {
+        "summary": "List all accounts of a logged user",
+        "description": "List all accounts of a logged user",
+        "operationId": "AccountService_ListAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ListAccountRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "AccountService"
+        ]
+      },
+      "post": {
+        "summary": "Use this endpoint to create a new bank account in a particular currency for an user",
+        "description": "Create a new bank account for a logged user",
+        "operationId": "AccountService_CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/CreateAccountRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateAccountReq"
+            }
+          }
+        ],
+        "tags": [
+          "AccountService"
+        ]
+      }
+    },
+    "/account/{id}": {
+      "get": {
+        "summary": "List logged user account",
+        "description": "List logged user account",
+        "operationId": "AccountService_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetAccountRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AccountService"
+        ]
+      }
+    },
+    "/transfer": {
+      "post": {
+        "summary": "Use this endpoint to transfer money between a logged user account and another account",
+        "description": "Transfer Money Endpoint",
+        "operationId": "TransferService_CreateTransfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/CreateTransferRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Transfer money between accounts",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTransferReq"
+            }
+          }
+        ],
+        "tags": [
+          "TransferService"
+        ]
+      }
+    },
     "/user": {
       "post": {
         "summary": "Use this endpoint to create new user in the system",
@@ -128,6 +274,85 @@
     }
   },
   "definitions": {
+    "Account": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "owner": {
+          "type": "string",
+          "format": "int64"
+        },
+        "balance": {
+          "type": "string",
+          "format": "int64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "User bank account type",
+      "title": "Account type"
+    },
+    "CreateAccountReq": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        }
+      },
+      "title": "Create"
+    },
+    "CreateAccountRes": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/Account"
+        }
+      }
+    },
+    "CreateTransferReq": {
+      "type": "object",
+      "properties": {
+        "fromAccountId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "toAccountId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "description": "Transfer money between accounts",
+      "title": "Create New Transfer",
+      "required": [
+        "fromAccountId",
+        "toAccountId",
+        "amount",
+        "currency"
+      ]
+    },
+    "CreateTransferRes": {
+      "type": "object",
+      "properties": {
+        "transfer": {
+          "$ref": "#/definitions/Transfer"
+        }
+      }
+    },
     "CreateUserReq": {
       "type": "object",
       "properties": {
@@ -158,6 +383,26 @@
       "properties": {
         "user": {
           "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "GetAccountRes": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/Account"
+        }
+      }
+    },
+    "ListAccountRes": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Account"
+          }
         }
       }
     },
@@ -212,6 +457,33 @@
           "type": "string"
         }
       }
+    },
+    "Transfer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "fromAccountId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "toAccountId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Transfer between two accounts",
+      "title": "Transfer type"
     },
     "User": {
       "type": "object",

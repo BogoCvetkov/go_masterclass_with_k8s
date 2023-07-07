@@ -39,6 +39,8 @@ func (s *UserService) RegisterServiceOnGateway(c context.Context, mux *runtime.S
 	return nil
 }
 
+// Methods
+
 func (s *UserService) CreateUser(c context.Context, data *pb.CreateUserReq) (*pb.CreateUserRes, error) {
 
 	// Encrypt password
