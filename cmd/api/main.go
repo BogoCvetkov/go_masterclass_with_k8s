@@ -36,6 +36,8 @@ func main() {
 	// Initialize new server
 	server := api.NewServer(store, config)
 
+	defer server.GetAsync().Close()
+
 	// Attach middlewares used everywhere
 	server.AttachGlobalMiddlewares()
 
@@ -45,7 +47,7 @@ func main() {
 	// Init custom validators
 	validator.RegisterValidation()
 
-	// Init GRP server in parallel
+	// Init GRPC server in parallel
 	gserver := g.NewServer(store, config)
 	go gserver.Start(config.GRPCPort)
 

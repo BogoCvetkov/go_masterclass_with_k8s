@@ -57,7 +57,7 @@ func (s *UserService) CreateUser(c context.Context, data *pb.CreateUserReq) (*pb
 	}
 
 	// Create new user
-	user, err := s.server.GetStore().CreateUser(c, document)
+	user, err := s.server.GetStore().CreateUserTrx(c, document, s.server.GetAsync())
 	if err != nil {
 
 		if db.ErrorCode(err) == db.UniqueViolation {
@@ -67,7 +67,7 @@ func (s *UserService) CreateUser(c context.Context, data *pb.CreateUserReq) (*pb
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	result := filterUser(&user)
+	result := filterUser(user)
 
 	return &pb.CreateUserRes{User: result}, nil
 }

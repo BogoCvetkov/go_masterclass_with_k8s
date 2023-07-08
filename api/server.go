@@ -9,6 +9,7 @@ import (
 	"github.com/BogoCvetkov/go_mastercalss/db"
 	"github.com/BogoCvetkov/go_mastercalss/interfaces"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 )
 
 type Server struct {
@@ -16,18 +17,21 @@ type Server struct {
 	store  *db.Store
 	auth   interfaces.IAuth
 	config *config.Config
+	async  *asynq.Client
 }
 
 func NewServer(s *db.Store, c *config.Config) *Server {
 
 	r := gin.Default()
 	a := auth.NewPasetoAuth(c.TokenSecret)
+	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.Redis})
 
 	return &Server{
 		store:  s,
 		router: r,
 		config: c,
 		auth:   a,
+		async:  asq,
 	}
 }
 
@@ -50,4 +54,7 @@ func (s *Server) GetAuth() interfaces.IAuth {
 }
 func (s *Server) GetConfig() *config.Config {
 	return s.config
+}
+func (s *Server) GetAsync() *asynq.Client {
+	return s.async
 }

@@ -24,8 +24,11 @@ generate-models:
 test:
 	go test -v -cover ./...
 
-start:
-	go run .
+start-api:
+	go run cmd\api\main.go
+
+start-workers:
+	go run cmd\async\main.go
 
 proto-generate:
 	del /Q /F .\pb\*.go >nul 2>&1

@@ -6,8 +6,10 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/hibiken/asynq"
 
 	"github.com/BogoCvetkov/go_mastercalss/auth"
 	"github.com/BogoCvetkov/go_mastercalss/config"
@@ -30,16 +32,19 @@ type GRPCServer struct {
 	config   *config.Config
 	srv      *grpc.Server
 	services []interfaces.IGService
+	async    *asynq.Client
 }
 
 func NewServer(s *db.Store, c *config.Config) *GRPCServer {
 
 	a := auth.NewPasetoAuth(c.TokenSecret)
+	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.Redis})
 
 	return &GRPCServer{
 		store:  s,
 		config: c,
 		auth:   a,
+		async:  asq,
 		services: []interfaces.IGService{
 			&grpc_server.UserService{},
 			&grpc_server.AccountService{},
@@ -159,6 +164,15 @@ func (g *GRPCServer) initGatewayServices(c context.Context, mux *runtime.ServeMu
 	return nil
 }
 
+// Allow to send tasks to redis queue
+func (g *GRPCServer) InitAsyncClient() {
+	redisAddr := os.Getenv("REDIS")
+
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: redisAddr})
+
+	g.async = client
+}
+
 // Getters that satisfy the interface
 func (s *GRPCServer) GetStore() *db.Store {
 	return s.store
@@ -171,4 +185,7 @@ func (s *GRPCServer) GetConfig() *config.Config {
 }
 func (s *GRPCServer) GetGServer() *grpc.Server {
 	return s.srv
+}
+func (s *GRPCServer) GetAsync() *asynq.Client {
+	return s.async
 }

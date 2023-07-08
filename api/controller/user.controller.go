@@ -8,7 +8,6 @@ import (
 	controller "github.com/BogoCvetkov/go_mastercalss/api/controller/types"
 	"github.com/BogoCvetkov/go_mastercalss/auth"
 
-	db_util "github.com/BogoCvetkov/go_mastercalss/db"
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	m "github.com/BogoCvetkov/go_mastercalss/middleware"
 	"github.com/BogoCvetkov/go_mastercalss/util"
@@ -43,19 +42,13 @@ func (ctr *userController) CreateUser(c *gin.Context) {
 	}
 
 	// Create new user
-	user, err := ctr.server.GetStore().CreateUser(c, document)
+	user, err := ctr.server.GetStore().CreateUserTrx(c, document, ctr.server.GetAsync())
 	if err != nil {
-
-		if db_util.ErrorCode(err) == db_util.UniqueViolation {
-			m.HandleErr(c, "Email already exists", http.StatusBadRequest)
-			return
-		}
-
 		m.HandleErr(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	result := filterUser(&user)
+	result := filterUser(user)
 
 	c.JSON(http.StatusOK, result)
 

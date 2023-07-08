@@ -17,6 +17,12 @@ type Config struct {
 	TokenDuration   time.Duration `mapstructure:"TOKEN_DURATION"`
 	TokenSecret     string        `mapstructure:"TOKEN_SECRET"`
 	RTokenDuration  time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+	SmtpHost        string        `mapstructure:"SMTP_HOST"`
+	SmtpPort        string        `mapstructure:"SMTP_PORT"`
+	SmtpUser        string        `mapstructure:"SMTP_USER"`
+	SmtpPass        string        `mapstructure:"SMTP_PASS"`
+	SmtpFrom        string        `mapstructure:"SMTP_FROM"`
+	Redis           string        `mapstructure:"REDIS"`
 }
 
 func LoadConfig() *Config {
@@ -27,6 +33,7 @@ func LoadConfig() *Config {
 	viper.SetDefault("Port", "8080")
 	viper.SetDefault("GRPCPort", "9000")
 	viper.SetDefault("GRPCGatewayPort", "5000")
+	viper.SetDefault("SmtpFrom", "bogo@test.com")
 
 	duration, err := time.ParseDuration("30m")
 	if err != nil {
