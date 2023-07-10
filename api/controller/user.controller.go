@@ -75,6 +75,11 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 		return
 	}
 
+	if !user.IsVerified {
+		m.HandleErr(c, "Account not verified", http.StatusBadRequest)
+		return
+	}
+
 	// Verify password
 	err = util.CheckPassword(data.Password, user.HashedPassword)
 	if err != nil {
@@ -190,6 +195,45 @@ func (ctr *userController) RefreshToken(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
 
+}
+
+func (ctr *userController) VerifyEmail(c *gin.Context) {
+	email := c.Query("email")
+	code := c.Query("code")
+
+	args1 := db.UpdateVerifyEmailParams{
+		Email:      email,
+		SecretCode: code,
+	}
+
+	// Verify email
+	token, err := ctr.server.GetStore().UpdateVerifyEmail(c, args1)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid verification code"})
+			return
+		}
+
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "email verification failed"})
+		return
+	}
+
+	args2 := db.UpdateUserParams{
+		ID: token.UserID,
+		IsVerified: sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		},
+	}
+
+	// Update user status
+	_, err = ctr.server.GetStore().UpdateUser(c, args2)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "email verification failed"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"msg": "Email Verification Success"})
 }
 
 func filterUser(u *db.User) *controller.CreateUserReponse {

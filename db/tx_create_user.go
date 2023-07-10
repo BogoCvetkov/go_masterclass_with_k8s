@@ -5,7 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/BogoCvetkov/go_mastercalss/async"
+	async_pay "github.com/BogoCvetkov/go_mastercalss/async/tasks/payload"
+	async_prod "github.com/BogoCvetkov/go_mastercalss/async/tasks/producer"
 	db "github.com/BogoCvetkov/go_mastercalss/db/generated"
 	"github.com/hibiken/asynq"
 )
@@ -32,11 +33,10 @@ func (s *Store) CreateUserTrx(c context.Context, data db.CreateUserParams, asq *
 		return nil, err
 	}
 
-	// Notify the created user
-	mailInfo := async.EmailDeliveryPayload{
+	// Send email-verification link
+	mailInfo := async_pay.VerifyEmailPayload{
 		UserID: user.ID,
 		Email:  user.Email,
-		Name:   user.FullName,
 	}
 
 	opts := []asynq.Option{
@@ -45,7 +45,7 @@ func (s *Store) CreateUserTrx(c context.Context, data db.CreateUserParams, asq *
 		asynq.Queue("critical"),
 	}
 
-	mailTask, err := async.NewEmailTask(mailInfo, opts...)
+	mailTask, err := async_prod.NewEmailTask(mailInfo, opts...)
 	if err != nil {
 		return nil, errors.New("failed to create email-task")
 	}

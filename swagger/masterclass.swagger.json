@@ -237,7 +237,7 @@
         ]
       }
     },
-    "/user/verify-token": {
+    "/user/refresh-token": {
       "post": {
         "summary": "Use this endpoint to issue a new access-token using the provided refresh token in /login route",
         "description": "Refresh access token",
@@ -264,6 +264,40 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/RefreshTokenReq"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/user/verify": {
+      "post": {
+        "summary": "Use this endpoint to verify newly registered emails",
+        "description": "Verify user account",
+        "operationId": "UserService_VerifyEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/VerifyEmailRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VerifyEmailReq"
             }
           }
         ],
@@ -512,6 +546,26 @@
       },
       "description": "Platform user type",
       "title": "User type"
+    },
+    "VerifyEmailReq": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      },
+      "title": "Verify Email"
+    },
+    "VerifyEmailRes": {
+      "type": "object",
+      "properties": {
+        "msg": {
+          "type": "string"
+        }
+      }
     },
     "protobufAny": {
       "type": "object",

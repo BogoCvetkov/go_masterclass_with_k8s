@@ -84,6 +84,10 @@ func (s *UserService) LoginUser(c context.Context, data *pb.LoginUserReq) (*pb.L
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
+	if !user.IsVerified {
+		return nil, status.Errorf(codes.Internal, "Account not verified")
+	}
+
 	// Verify password
 	err = util.CheckPassword(data.Password, user.HashedPassword)
 	if err != nil {
@@ -181,6 +185,43 @@ func (s *UserService) RefreshToken(c context.Context, data *pb.RefreshTokenReq) 
 	}
 
 	return &pb.RefreshTokenRes{Token: token}, nil
+}
+
+func (s *UserService) VerifyEmail(c context.Context, data *pb.VerifyEmailReq) (*pb.VerifyEmailRes, error) {
+
+	args1 := gen.UpdateVerifyEmailParams{
+		Email:      data.Email,
+		SecretCode: data.Code,
+	}
+
+	// Verify email
+	token, err := s.server.GetStore().UpdateVerifyEmail(c, args1)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Errorf(codes.Unauthenticated, "invalid verification code")
+		}
+
+		return nil, status.Errorf(codes.Internal, "email verification failed")
+	}
+
+	args2 := gen.UpdateUserParams{
+		ID: token.UserID,
+		IsVerified: sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		},
+	}
+
+	// Update user status
+	_, err = s.server.GetStore().UpdateUser(c, args2)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "email verification failed")
+	}
+
+	return &pb.VerifyEmailRes{
+		Msg: "Email Verification Success",
+	}, nil
+
 }
 
 func filterUser(u *gen.User) *pb.User {

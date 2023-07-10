@@ -1,12 +1,14 @@
 package main
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/BogoCvetkov/go_mastercalss/async"
+	consumer "github.com/BogoCvetkov/go_mastercalss/async/tasks/consumer"
+	producer "github.com/BogoCvetkov/go_mastercalss/async/tasks/producer"
 	"github.com/BogoCvetkov/go_mastercalss/config"
-	"github.com/go-redis/redis/v8"
+	"github.com/BogoCvetkov/go_mastercalss/db"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -16,39 +18,26 @@ func main() {
 	// Load Config
 	config := config.LoadConfig()
 
-	redisAddr := config.Redis
+	// Initialize DB connection and Store
+	conn, err := sql.Open(config.DBDriver, config.DB)
 
-	logger := async.NewLogger()
-	redis.SetLogger(logger)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed connecting to DB")
+	}
 
-	srv := asynq.NewServer(
-		asynq.RedisClientOpt{Addr: redisAddr},
-		asynq.Config{
-			// Specify how many concurrent workers to use
-			Concurrency: 3,
-			// Optionally specify multiple queues with different priority.
-			Queues: map[string]int{
-				"critical": 6,
-				"default":  3,
-				"low":      1,
-			},
-			ErrorHandler: asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error) {
-				log.Error().Err(err).Str("type", task.Type()).
-					Bytes("payload", task.Payload()).Msg("process task failed")
-			}),
-			Logger: logger,
-		},
-	)
+	store := db.NewStore(conn)
+
+	srv := async.NewServer(store, config)
 
 	mux := asynq.NewServeMux()
 
-	asyncManager := async.NewAsyncManager(config)
+	taskManager := consumer.NewTaskConsumerManager(srv)
 
-	mux.HandleFunc(async.TypeEmailDelivery, asyncManager.EmailProcessor.ProcessTask)
+	mux.HandleFunc(producer.TypeEmailDelivery, taskManager.EmailProcessor.ProcessTask)
 
-	fmt.Printf("Redis Workers start listening on Redis Queue ---> %s", redisAddr)
+	fmt.Printf("Redis Workers start listening on Redis Queue ---> %s", config.Redis)
 
-	if err := srv.Run(mux); err != nil {
+	if err := srv.Srv.Run(mux); err != nil {
 		fmt.Printf("could not run redis workers server: %v", err)
 	}
 }

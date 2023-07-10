@@ -98,6 +98,26 @@ message RefreshTokenRes {
     string token = 1;
 }
 
+// Verify Email
+message VerifyEmailReq {
+     // Swagger
+     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Verify email"
+            description: "Verify email params"
+            required: ["email","code"]
+        }
+
+    };
+
+    string email = 1;
+    string code = 2;
+ }
+
+message VerifyEmailRes {
+    string msg = 1;
+}
+
 
 service UserService {
     rpc CreateUser(CreateUserReq) returns (CreateUserRes) {
@@ -127,13 +147,25 @@ service UserService {
 
     rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes) {
         option (google.api.http) = {
-            post: "/user/verify-token"
+            post: "/user/refresh-token"
             body: "*"
         };
          // Swagger
          option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Refresh access token"
             summary: "Use this endpoint to issue a new access-token using the provided refresh token in /login route"
+        };
+    };
+
+    rpc VerifyEmail(VerifyEmailReq) returns (VerifyEmailRes) {
+        option (google.api.http) = {
+            post: "/user/verify"
+            body: "*"
+        };
+         // Swagger
+         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Verify user account"
+            summary: "Use this endpoint to verify newly registered emails"
         };
     };
 }
