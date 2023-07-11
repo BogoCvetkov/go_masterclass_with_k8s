@@ -1,8 +1,11 @@
 package api
 
 import (
+	"net/http"
+
 	api "github.com/BogoCvetkov/go_mastercalss/api/controller"
 	"github.com/BogoCvetkov/go_mastercalss/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) AttachRoutes() {
@@ -10,6 +13,11 @@ func (s *Server) AttachRoutes() {
 	ctr := api.InitControllers(s)
 
 	api := s.router.Group("/api")
+
+	// health check
+	s.router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "pong")
+	})
 
 	// Public routes
 	{
@@ -51,4 +59,5 @@ func (s *Server) AttachRoutes() {
 func (s *Server) AttachGlobalMiddlewares() {
 	// Handle errors globaly
 	s.router.Use(middleware.ErrorMiddleware)
+
 }

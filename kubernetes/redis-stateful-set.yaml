@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-srv
+  namespace: go-masterclass
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      # Headless service - that exposes each stateful pod(saparate db instance) individualy
+  clusterIP: None
+  # type: NodePort
+  selector:
+    role: redis
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: go-masterclass
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: redis
+  serviceName: redis-srv
+  template:
+    metadata:
+      labels:
+        role: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.0-alpine
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 6379
+        volumeMounts:
+          - name: redis-persistent-storage
+            mountPath: /data
+        env:
+          - name: REDIS_USER
+            valueFrom:
+              secretKeyRef:
+                  name: redis-secret 
+                  key: REDIS_USER
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                  name: redis-secret 
+                  key: REDIS_PASSWORD
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-persistent-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
