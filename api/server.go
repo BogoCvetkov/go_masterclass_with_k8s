@@ -24,7 +24,12 @@ func NewServer(s *db.Store, c *config.Config) *Server {
 
 	r := gin.Default()
 	a := auth.NewPasetoAuth(c.TOKEN_SECRET)
-	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.REDIS})
+	opts := asynq.RedisClientOpt{Addr: c.REDIS}
+	if c.REDIS_USER != "" && c.REDIS_PASS != "" {
+		opts.Username = c.REDIS_USER
+		opts.Password = c.REDIS_PASS
+	}
+	asq := asynq.NewClient(opts)
 
 	return &Server{
 		store:  s,

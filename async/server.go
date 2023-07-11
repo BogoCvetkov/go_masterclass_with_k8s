@@ -32,8 +32,14 @@ func NewServer(s *db.Store, c *config.Config) *AsyncServer {
 	logger := NewLogger()
 	redis.SetLogger(logger)
 
+	opts := asynq.RedisClientOpt{Addr: redisAddr}
+	if c.REDIS_USER != "" && c.REDIS_PASS != "" {
+		opts.Username = c.REDIS_USER
+		opts.Password = c.REDIS_PASS
+	}
+
 	srv := asynq.NewServer(
-		asynq.RedisClientOpt{Addr: redisAddr},
+		opts,
 		asynq.Config{
 			// Specify how many concurrent workers to use
 			Concurrency: 3,

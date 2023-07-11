@@ -23,6 +23,8 @@ type Config struct {
 	SMTP_PASS              string        `mapstructure:"SMTP_PASS"`
 	SMTP_FROM              string        `mapstructure:"SMTP_FROM"`
 	REDIS                  string        `mapstructure:"REDIS"`
+	REDIS_USER             string        `mapstructure:"REDIS_USER"`
+	REDIS_PASS             string        `mapstructure:"REDIS_PASS"`
 }
 
 func LoadConfig() *Config {
@@ -47,6 +49,8 @@ func LoadConfig() *Config {
 	viper.SetDefault("SMTP_PASS", "")
 	viper.SetDefault("SMTP_FROM", "")
 	viper.SetDefault("REDIS", "")
+	viper.SetDefault("REDIS_PASS", "")
+	viper.SetDefault("REDIS_USER", "")
 
 	duration, err := time.ParseDuration("30m")
 	if err != nil {

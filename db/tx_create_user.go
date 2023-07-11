@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	async_pay "github.com/BogoCvetkov/go_mastercalss/async/tasks/payload"
@@ -51,6 +52,7 @@ func (s *Store) CreateUserTrx(c context.Context, data db.CreateUserParams, asq *
 	}
 	_, err = asq.Enqueue(mailTask)
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.New("failed to send email")
 	}
 
