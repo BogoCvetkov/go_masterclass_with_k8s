@@ -37,8 +37,8 @@ type GRPCServer struct {
 
 func NewServer(s *db.Store, c *config.Config) *GRPCServer {
 
-	a := auth.NewPasetoAuth(c.TokenSecret)
-	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.Redis})
+	a := auth.NewPasetoAuth(c.TOKEN_SECRET)
+	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.REDIS})
 
 	return &GRPCServer{
 		store:  s,
@@ -73,7 +73,7 @@ func (g *GRPCServer) Start(p string) {
 	)
 
 	// Enable reflection
-	if g.config.Env == "DEV" {
+	if g.config.ENV == "DEV" {
 		reflection.Register(g.srv)
 	}
 

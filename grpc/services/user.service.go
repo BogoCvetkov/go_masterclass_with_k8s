@@ -95,7 +95,7 @@ func (s *UserService) LoginUser(c context.Context, data *pb.LoginUserReq) (*pb.L
 	}
 
 	// Prepare access token payload
-	p1, err := auth.NewTokenPayload(user.ID, s.server.GetConfig().TokenDuration)
+	p1, err := auth.NewTokenPayload(user.ID, s.server.GetConfig().TOKEN_DURATION)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed generating token")
 	}
@@ -107,7 +107,7 @@ func (s *UserService) LoginUser(c context.Context, data *pb.LoginUserReq) (*pb.L
 	}
 
 	// Prepare REFRESH token payload
-	p2, err := auth.NewTokenPayload(user.ID, s.server.GetConfig().RTokenDuration)
+	p2, err := auth.NewTokenPayload(user.ID, s.server.GetConfig().REFRESH_TOKEN_DURATION)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed generating refresh token")
 	}
@@ -173,7 +173,7 @@ func (s *UserService) RefreshToken(c context.Context, data *pb.RefreshTokenReq) 
 	}
 
 	// Prepare access token payload
-	p, err := auth.NewTokenPayload(payload.UserID, s.server.GetConfig().TokenDuration)
+	p, err := auth.NewTokenPayload(payload.UserID, s.server.GetConfig().TOKEN_DURATION)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed generating token")
 	}

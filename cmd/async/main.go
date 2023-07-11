@@ -19,7 +19,7 @@ func main() {
 	config := config.LoadConfig()
 
 	// Initialize DB connection and Store
-	conn, err := sql.Open(config.DBDriver, config.DB)
+	conn, err := sql.Open(config.DB_DRIVER, config.DB_URL)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed connecting to DB")
@@ -35,7 +35,7 @@ func main() {
 
 	mux.HandleFunc(producer.TypeEmailDelivery, taskManager.EmailProcessor.ProcessTask)
 
-	fmt.Printf("Redis Workers start listening on Redis Queue ---> %s", config.Redis)
+	fmt.Printf("Redis Workers start listening on Redis Queue ---> %s", config.REDIS)
 
 	if err := srv.Srv.Run(mux); err != nil {
 		fmt.Printf("could not run redis workers server: %v", err)

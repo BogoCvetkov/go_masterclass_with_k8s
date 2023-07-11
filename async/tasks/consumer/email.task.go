@@ -56,7 +56,7 @@ func (p *EmailProcessor) ProcessTask(c context.Context, t *asynq.Task) error {
 	}
 
 	// Build verification link
-	link := fmt.Sprintf("localhost:%s/api/user/verify?email=%s&code=%s", p.srv.GetConfig().Port, verification.Email, verification.SecretCode)
+	link := fmt.Sprintf("localhost:%s/api/user/verify?email=%s&code=%s", p.srv.GetConfig().PORT, verification.Email, verification.SecretCode)
 
 	// HTML message
 	msg := fmt.Sprintf("Welcome <b>%s</b>. Your account was just created for email <i>%s</i>!.You can verify at this link - <a href=%s> Verify </href>  ", user.FullName, user.Email, link)

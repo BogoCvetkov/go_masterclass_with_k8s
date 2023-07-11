@@ -20,12 +20,12 @@ func main() {
 	config := config.LoadConfig()
 
 	// Config logger
-	if config.Env == "DEV" {
+	if config.ENV == "DEV" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	// Initialize DB connection and Store
-	conn, err := sql.Open(config.DBDriver, config.DB)
+	conn, err := sql.Open(config.DB_DRIVER, config.DB_URL)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed connecting to DB")
@@ -49,11 +49,11 @@ func main() {
 
 	// Init GRPC server in parallel
 	gserver := g.NewServer(store, config)
-	go gserver.Start(config.GRPCPort)
+	go gserver.Start(config.GRPC_PORT)
 
 	// GRPC gateway
-	go gserver.StartHttpGateway(config.GRPCGatewayPort)
+	go gserver.StartHttpGateway(config.GRPC_GATEWAY_PORT)
 
 	// Start listening
-	server.Start(config.Port)
+	server.Start(config.PORT)
 }

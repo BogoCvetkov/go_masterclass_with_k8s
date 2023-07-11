@@ -15,10 +15,10 @@ type Mailer struct {
 }
 
 func NewMailer(config *config.Config) *Mailer {
-	host := config.SmtpHost
-	port, err := strconv.Atoi(config.SmtpPort)
-	user := config.SmtpUser
-	pass := config.SmtpPass
+	host := config.SMTP_HOST
+	port, err := strconv.Atoi(config.SMTP_PORT)
+	user := config.SMTP_USER
+	pass := config.SMTP_PASS
 
 	if err != nil {
 		log.Fatal("Wrong port variable")
@@ -32,7 +32,7 @@ func NewMailer(config *config.Config) *Mailer {
 
 func (m *Mailer) NewMail(to string, sub string, content string) error {
 	msg := gomail.NewMessage()
-	msg.SetHeader("From", m.config.SmtpFrom)
+	msg.SetHeader("From", m.config.SMTP_FROM)
 	msg.SetHeader("To", to)
 	msg.SetHeader("Subject", sub)
 	msg.SetBody("text/html", content)

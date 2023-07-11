@@ -23,8 +23,8 @@ type Server struct {
 func NewServer(s *db.Store, c *config.Config) *Server {
 
 	r := gin.Default()
-	a := auth.NewPasetoAuth(c.TokenSecret)
-	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.Redis})
+	a := auth.NewPasetoAuth(c.TOKEN_SECRET)
+	asq := asynq.NewClient(asynq.RedisClientOpt{Addr: c.REDIS})
 
 	return &Server{
 		store:  s,

@@ -1,7 +1,4 @@
 # USED ONLY IN DEVELOPMENT
-export DB_URL=postgres://postgres:secret@localhost:5432/postgres?sslmode=disable
-export PORT=3000
-export DB_DRIVER=postgres
 MIGRATION_NAME ?= new_migration
 
 db-new-migration:

@@ -27,7 +27,7 @@ func (s *AsyncServer) GetConfig() *config.Config {
 
 func NewServer(s *db.Store, c *config.Config) *AsyncServer {
 
-	redisAddr := c.Redis
+	redisAddr := c.REDIS
 
 	logger := NewLogger()
 	redis.SetLogger(logger)

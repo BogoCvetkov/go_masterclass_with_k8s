@@ -88,7 +88,7 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 	}
 
 	// Prepare access token payload
-	p1, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().TokenDuration)
+	p1, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().TOKEN_DURATION)
 	if err != nil {
 		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
 		return
@@ -102,7 +102,7 @@ func (ctr *userController) LoginUser(c *gin.Context) {
 	}
 
 	// Prepare REFRESH token payload
-	p2, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().RTokenDuration)
+	p2, err := auth.NewTokenPayload(user.ID, ctr.server.GetConfig().REFRESH_TOKEN_DURATION)
 	if err != nil {
 		m.HandleErr(c, "Failed generating refresh token", http.StatusBadRequest)
 		return
@@ -180,7 +180,7 @@ func (ctr *userController) RefreshToken(c *gin.Context) {
 	}
 
 	// Prepare access token payload
-	p, err := auth.NewTokenPayload(payload.UserID, ctr.server.GetConfig().TokenDuration)
+	p, err := auth.NewTokenPayload(payload.UserID, ctr.server.GetConfig().TOKEN_DURATION)
 	if err != nil {
 		m.HandleErr(c, "Failed generating token", http.StatusBadRequest)
 		return

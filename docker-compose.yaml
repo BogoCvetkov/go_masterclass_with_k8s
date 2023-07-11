@@ -15,8 +15,7 @@ services:
       - '4000:8080'
      environment:
       REDIS_ADDR: redis:6379
-      
-
+  
   db:
     image: 'postgres:15-alpine'
     ports:
@@ -37,6 +36,67 @@ services:
       ports:
         - 1025:1025 # smtp server
         - 8025:8025 # web ui
+
+  app:
+    depends_on:
+        - db
+        - redis
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: always
+    ports:
+      - "3000:3000"
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      DB_URL: postgres://postgres:secret@db:5432/postgres?sslmode=disable
+      PORT: 3000
+      ENV: DEV
+      GRPC_PORT: 9000
+      GRPC_GATEWAY_PORT: 9001
+      DB_DRIVER: postgres
+      TOKEN_DURATION: 2m
+      TOKEN_SECRET: YELLOW SUBMARINE, BLACK WIZARDRY
+      REFRESH_TOKEN_DURATION: 15m  
+      REFRESH_TOKEN_SECRET: YELLOW SUBMARINE, BLACK WIZARDRY  
+      # SMTP
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_USER: bogo
+      SMTP_PASS: pass
+      SMTP_FROM: bogo.dev@mail.bg
+      # REDIS
+      REDIS: redis:6379
+
+  redis-workers:
+    depends_on:
+        - db
+        - redis
+    build:
+      context: .
+      dockerfile: Dockerfile.workers
+    restart: always
+    environment:
+      DB_URL: postgres://postgres:secret@db:5432/postgres?sslmode=disable
+      PORT: 3000
+      ENV: DEV
+      GRPC_PORT: 9000
+      GRPC_GATEWAY_PORT: 9001
+      DB_DRIVER: postgres
+      TOKEN_DURATION: 2m
+      TOKEN_SECRET: YELLOW SUBMARINE, BLACK WIZARDRY
+      REFRESH_TOKEN_DURATION: 15m  
+      REFRESH_TOKEN_SECRET: YELLOW SUBMARINE, BLACK WIZARDRY  
+      # SMTP
+      SMTP_HOST: mailhog
+      ENCRYTION: none
+      SMTP_PORT: 1025
+      SMTP_USER: ""
+      SMTP_PASS: pass
+      SMTP_FROM: bogo.dev@mail.bg
+      # REDIS
+      REDIS: redis:6379
 
 volumes:
   postgres-db:

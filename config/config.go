@@ -8,32 +8,45 @@ import (
 )
 
 type Config struct {
-	DB              string        `mapstructure:"DB_URL"`
-	DBDriver        string        `mapstructure:"DB_DRIVER"`
-	Port            string        `mapstructure:"PORT"`
-	GRPCPort        string        `mapstructure:"GRPC_PORT"`
-	GRPCGatewayPort string        `mapstructure:"GRPC_GATEWAY_PORT"`
-	Env             string        `mapstructure:"ENV"`
-	TokenDuration   time.Duration `mapstructure:"TOKEN_DURATION"`
-	TokenSecret     string        `mapstructure:"TOKEN_SECRET"`
-	RTokenDuration  time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
-	SmtpHost        string        `mapstructure:"SMTP_HOST"`
-	SmtpPort        string        `mapstructure:"SMTP_PORT"`
-	SmtpUser        string        `mapstructure:"SMTP_USER"`
-	SmtpPass        string        `mapstructure:"SMTP_PASS"`
-	SmtpFrom        string        `mapstructure:"SMTP_FROM"`
-	Redis           string        `mapstructure:"REDIS"`
+	DB_URL                 string        `mapstructure:"DB_URL"`
+	DB_DRIVER              string        `mapstructure:"DB_DRIVER"`
+	PORT                   string        `mapstructure:"PORT"`
+	GRPC_PORT              string        `mapstructure:"GRPC_PORT"`
+	GRPC_GATEWAY_PORT      string        `mapstructure:"GRPC_GATEWAY_PORT"`
+	ENV                    string        `mapstructure:"ENV"`
+	TOKEN_DURATION         time.Duration `mapstructure:"TOKEN_DURATION"`
+	TOKEN_SECRET           string        `mapstructure:"TOKEN_SECRET"`
+	REFRESH_TOKEN_DURATION time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+	SMTP_HOST              string        `mapstructure:"SMTP_HOST"`
+	SMTP_PORT              string        `mapstructure:"SMTP_PORT"`
+	SMTP_USER              string        `mapstructure:"SMTP_USER"`
+	SMTP_PASS              string        `mapstructure:"SMTP_PASS"`
+	SMTP_FROM              string        `mapstructure:"SMTP_FROM"`
+	REDIS                  string        `mapstructure:"REDIS"`
 }
 
 func LoadConfig() *Config {
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 
-	viper.SetDefault("Env", "DEV")
-	viper.SetDefault("Port", "8080")
-	viper.SetDefault("GRPCPort", "9000")
-	viper.SetDefault("GRPCGatewayPort", "5000")
-	viper.SetDefault("SmtpFrom", "bogo@test.com")
+	viper.SetDefault("ENV", "DEV")
+	viper.SetDefault("PORT", "8080")
+	viper.SetDefault("GRPC_PORT", "9000")
+	viper.SetDefault("GRPC_GATEWAY_PORT", "5000")
+	viper.SetDefault("SMTP_FROM", "bogo@test.com")
+
+	// Allow override by ENV vars
+	viper.SetDefault("DB_URL", "")
+	viper.SetDefault("DB_DRIVER", "")
+	viper.SetDefault("TOKEN_DURATION", "")
+	viper.SetDefault("TOKEN_SECRET", "")
+	viper.SetDefault("REFRESH_TOKEN_DURATION", "")
+	viper.SetDefault("SMTP_HOST", "")
+	viper.SetDefault("SMTP_PORT", "")
+	viper.SetDefault("SMTP_USER", "")
+	viper.SetDefault("SMTP_PASS", "")
+	viper.SetDefault("SMTP_FROM", "")
+	viper.SetDefault("REDIS", "")
 
 	duration, err := time.ParseDuration("30m")
 	if err != nil {
@@ -46,7 +59,7 @@ func LoadConfig() *Config {
 
 	err = viper.ReadInConfig() // Find and read the config file
 	if err != nil {            // Handle errors reading the config file
-		panic(fmt.Errorf("error reading config file: %w", err))
+		fmt.Errorf("error reading config file: %w", err)
 	}
 
 	var config Config
