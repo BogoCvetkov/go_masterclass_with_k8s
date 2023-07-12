@@ -42,6 +42,29 @@ spec:
       labels:
         module-name: api-module
     spec:
+      initContainers:
+          - name: migrate-database
+            image: ghcr.io/bogocvetkov/go_masterclass/db-migrate:main
+            imagePullPolicy: Always
+            # volumeMounts:
+            #   - name: tmp
+            #     mountPath: /tmp
+            securityContext:
+              runAsUser: 1001
+              runAsNonRoot: true
+            resources:
+              limits:
+                memory: 200Mi
+                cpu: 200m
+              requests:
+                memory: 150Mi
+                cpu: 150m
+            env:
+              - name: DB_URL
+                valueFrom:
+                  secretKeyRef:
+                      name: app-secret
+                      key: DB_URL
       containers:
       - image: ghcr.io/bogocvetkov/go_masterclass/api:main
         name: api-image
