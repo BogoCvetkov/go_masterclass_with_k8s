@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: db-migarate
+  IMAGE_NAME: db-migrate
   REGISTRY: ghcr.io
 
 jobs:
