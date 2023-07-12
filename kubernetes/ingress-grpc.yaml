@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: go-masterclass
+  name: go-masterclass-ingress-grpc
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Development config
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-srv
+            port:
+              number: 9000
+  
+  tls:
+    - hosts:
+        - localhost
+      secretName: magda-local-cert-tls
+      

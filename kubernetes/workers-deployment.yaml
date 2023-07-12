@@ -1,36 +1,13 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: api-srv
-  namespace: go-masterclass
-spec:
-  selector:
-    module-name: api-module
-  ports:
-  - port: 3000
-    name: http
-    targetPort: 3000
-    protocol: TCP
-  - port: 9000
-    name: g-rpc
-    targetPort: 9000
-    protocol: TCP
-  - port: 9001
-    name: g-rpc-gateway
-    targetPort: 9001
-    protocol: TCP
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-deployment
+  name: workers-deployment
   namespace: go-masterclass
 spec:
   replicas: 1
   selector:
     matchLabels:
-      module-name: api-module
+      module-name: workers-module
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -39,58 +16,17 @@ spec:
   template:
     metadata:
       labels:
-        module-name: api-module
+        module-name: workers-module
     spec:
-      initContainers:
-          - name: migrate-database
-            image: ghcr.io/bogocvetkov/go_masterclass/db-migrate:main
-            imagePullPolicy: Always
-            securityContext:
-              runAsUser: 1001
-              runAsNonRoot: true
-            resources:
-              limits:
-                memory: 200Mi
-                cpu: 200m
-              requests:
-                memory: 150Mi
-                cpu: 150m
-            env:
-              - name: DB_URL
-                valueFrom:
-                  secretKeyRef:
-                      name: app-secret
-                      key: DB_URL
       containers:
-      - image: ghcr.io/bogocvetkov/go_masterclass/api:main
-        name: api-image
+      - image: ghcr.io/bogocvetkov/go_masterclass/workers:main
+        name: workers-image
         # Testing with locally build images
         # imagePullPolicy: Never
         imagePullPolicy: Always
         securityContext:
           runAsUser: 1001
           runAsNonRoot: true
-        ports:
-          - containerPort: 3000
-            protocol: TCP
-          - containerPort: 9000
-            protocol: TCP
-          - containerPort: 9001
-            protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /ping
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 3
-        readinessProbe:
-          httpGet:
-            path: /ping
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
         resources:
            limits:
               cpu: 200m
