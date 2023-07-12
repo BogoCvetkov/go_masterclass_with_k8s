@@ -29,6 +29,15 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data/
 
+  db-migrate:
+    depends_on:
+        - db
+    build:
+      context: .
+      dockerfile: Dockerfile.migrations
+    environment:
+      DB_URL: postgres://postgres:secret@db:5432/postgres?sslmode=disable
+
   mailhog:
       image: mailhog/mailhog
       logging:

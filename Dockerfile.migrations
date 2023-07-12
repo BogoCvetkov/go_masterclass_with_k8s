@@ -1,0 +1,23 @@
+FROM golang:1.19-alpine3.16 AS builder
+
+WORKDIR /app
+
+COPY ./db/migrations ./db/migrations
+COPY Makefile .
+
+# Install make
+RUN apk add --update make
+RUN apk add --update curl
+
+# Download and install migrate
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz \
+    && mv migrate.linux-amd64 /usr/bin/migrate
+
+
+# Don't run as root
+RUN adduser -D -u 1001 bogo
+RUN chown -R bogo:bogo /app
+USER bogo
+
+# Migrate DB
+CMD ["make", "db-migrate-up-linux"]

@@ -10,7 +10,7 @@ db-migrate-up:
 
 db-migrate-up-linux:
 	migrate -path db/migrations -database "$(DB_URL)" -verbose up
-	migrate -path db/migrations -database "$(DB_URL)" -verbose up
+	echo "DB migrated"
 
 db-migrate-down:
 	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${DB_URL}" -verbose down 1
