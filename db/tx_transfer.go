@@ -32,7 +32,7 @@ func (s *Store) TransferTrx(ctx context.Context, data db.CreateTransferParams) (
 	qtx := s.WithTx(tx)
 
 	// Check if sender has enough balance
-	from, err := qtx.GetAccountForUpdate(ctx, data.FromAccountID)
+	from, err := qtx.GetAccount(ctx, data.FromAccountID)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

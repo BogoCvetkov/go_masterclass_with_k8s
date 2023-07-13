@@ -17,6 +17,7 @@ jobs:
         env:
           POSTGRES_USER: ${{ vars.DB_USER }}
           POSTGRES_PASSWORD: ${{ vars.DB_PASS }}
+          POSTGRES_DB: test
         ports:
           - 5432:5432
         options: >-

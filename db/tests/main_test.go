@@ -12,7 +12,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbUrl    = "postgres://postgres:secret@localhost:5432/postgres?sslmode=disable"
+	dbUrl    = "postgres://postgres:secret@localhost:5432/test?sslmode=disable"
 )
 
 var testStore *db.Store

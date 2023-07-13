@@ -5,8 +5,7 @@ db-new-migration:
 	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate create -ext sql -dir db/migrations -seq "$(MIGRATION_NAME)"
 
 db-migrate-up:
-	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${DB_URL}" -verbose up 1
-	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${DB_URL}" -verbose up 1
+	docker run --rm -v "$(shell echo %cd%):/src" -w /src --network host migrate/migrate -path=./db/migrations -database "${DB_URL}" -verbose up 
 
 db-migrate-up-linux:
 	migrate -path db/migrations -database "$(DB_URL)" -verbose up

@@ -64,7 +64,7 @@ func TestListAccounts(t *testing.T) {
 	}
 
 	arg := db.ListAccountsParams{
-		// Owner:  lastAccount.Owner,
+		Owner:  lastAccount.Owner,
 		Limit:  5,
 		Offset: 0,
 	}
@@ -80,8 +80,10 @@ func TestListAccounts(t *testing.T) {
 }
 
 func createRandomAccount(t *testing.T) db.Account {
+	user := createRandomUser(t)
+
 	arg := db.CreateAccountParams{
-		// Owner:    RandomOwner(),
+		Owner:    user.ID,
 		Balance:  RandomMoney(),
 		Currency: RandomCurrency(),
 	}
