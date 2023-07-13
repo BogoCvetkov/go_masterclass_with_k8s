@@ -43,7 +43,7 @@ jobs:
         which migrate
 
     - name: Run migrations
-      run: make db-migrate-up-linux
+      run: make db-migrate-up-linux DB_URL=postgres://postgres:secret@localhost:5432/test?sslmode=disable
 
     - name: Test
       run: make test
