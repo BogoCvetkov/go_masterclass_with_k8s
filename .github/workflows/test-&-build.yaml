@@ -48,7 +48,7 @@ jobs:
     - name: Test
       run: make test
 
-  # If tests have passed build the images
+  # If tests have passed build the images 
   build-workers:
     needs: test
     permissions:
