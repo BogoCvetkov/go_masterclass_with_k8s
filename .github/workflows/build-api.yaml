@@ -1,10 +1,9 @@
 name: Build api
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+  # Call after the tests have passed
+  workflow_call:
 
 env:
   IMAGE_NAME: api
