@@ -47,3 +47,14 @@ jobs:
 
     - name: Test
       run: make test
+
+  # If tests have passed build the images
+  build-workers:
+    needs: test
+    uses: ./.github/workflows/build-workers.yml
+  build-api:
+    needs: test
+    uses: ./.github/workflows/build-api.yml
+  build-migrations:
+    needs: test
+    uses: ./.github/workflows/build-migrations.yml

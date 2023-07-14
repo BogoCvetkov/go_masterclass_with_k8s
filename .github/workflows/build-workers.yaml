@@ -1,10 +1,9 @@
 name: Build workers
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+  # Call after the tests have passed
+  workflow_call:
 
 env:
   IMAGE_NAME: workers
@@ -13,6 +12,7 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: test.test
     permissions:
       contents: read
       packages: write
