@@ -51,10 +51,10 @@ jobs:
   # If tests have passed build the images
   build-workers:
     needs: test
-    uses: ./.github/workflows/build-workers.yml
+    uses: ./.github/workflows/build-workers.yaml
   build-api:
     needs: test
-    uses: ./.github/workflows/build-api.yml
+    uses: ./.github/workflows/build-api.yaml
   build-migrations:
     needs: test
-    uses: ./.github/workflows/build-migrations.yml
+    uses: ./.github/workflows/build-migrations.yaml
