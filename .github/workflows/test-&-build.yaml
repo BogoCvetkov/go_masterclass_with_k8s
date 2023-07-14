@@ -53,14 +53,17 @@ jobs:
     needs: test
     permissions:
       packages: write
+      contents: read
     uses: ./.github/workflows/build-workers.yaml
   build-api:
     needs: test
     permissions:
       packages: write
+      contents: read
     uses: ./.github/workflows/build-api.yaml
   build-migrations:
     needs: test
     permissions:
       packages: write
+      contents: read
     uses: ./.github/workflows/build-migrations.yaml
