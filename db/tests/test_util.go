@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const UniqueViolation = "23505"
+const ErrRecordNotFound = "02000"
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 func init() {

@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware(a interfaces.IAuth, s *db.Store) gin.HandlerFunc {
+func AuthMiddleware(a interfaces.IAuth, s db.IStore) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		// Get the Authorization header value

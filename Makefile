@@ -20,6 +20,9 @@ generate-models:
 test:
 	go test -v -cover ./...
 
+generate-mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/BogoCvetkov/go_mastercalss/db IStore
+
 start-api:
 	go run cmd\api\main.go
 

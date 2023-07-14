@@ -14,13 +14,13 @@ import (
 
 type Server struct {
 	router *gin.Engine
-	store  *db.Store
+	store  db.IStore
 	auth   interfaces.IAuth
 	config *config.Config
 	async  *asynq.Client
 }
 
-func NewServer(s *db.Store, c *config.Config) *Server {
+func NewServer(s db.IStore, c *config.Config) *Server {
 
 	r := gin.Default()
 	a := auth.NewPasetoAuth(c.TOKEN_SECRET)
@@ -51,7 +51,7 @@ func (s *Server) Start(p string) {
 }
 
 // Getters that satisfy the interface
-func (s *Server) GetStore() *db.Store {
+func (s *Server) GetStore() db.IStore {
 	return s.store
 }
 func (s *Server) GetAuth() interfaces.IAuth {
@@ -62,4 +62,7 @@ func (s *Server) GetConfig() *config.Config {
 }
 func (s *Server) GetAsync() *asynq.Client {
 	return s.async
+}
+func (s *Server) GetRouter() *gin.Engine {
+	return s.router
 }
