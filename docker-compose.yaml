@@ -9,6 +9,7 @@ services:
     volumes: 
       - redis:/data
 
+  # An UI to visualize the task queues
   asynq-ui:
      image: hibiken/asynqmon
      ports:
