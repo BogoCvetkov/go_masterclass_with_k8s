@@ -19,7 +19,7 @@ spec:
         module-name: workers-module
     spec:
       containers:
-      - image: ghcr.io/bogocvetkov/go_masterclass/workers:main
+      - image: ghcr.io/bogocvetkov/go_masterclass_with_k8s/workers:main
         name: workers-image
         # Testing with locally build images
         # imagePullPolicy: Never

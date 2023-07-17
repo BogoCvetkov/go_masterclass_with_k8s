@@ -43,7 +43,7 @@ spec:
     spec:
       initContainers:
           - name: migrate-database
-            image: ghcr.io/bogocvetkov/go_masterclass/db-migrate:main
+            image: ghcr.io/bogocvetkov/go_masterclass_with_k8s/db-migrate:main
             imagePullPolicy: Always
             securityContext:
               runAsUser: 1001
@@ -62,7 +62,7 @@ spec:
                       name: app-secret
                       key: DB_URL
       containers:
-      - image: ghcr.io/bogocvetkov/go_masterclass/api:main
+      - image: ghcr.io/bogocvetkov/go_masterclass_with_k8s/api:main
         name: api-image
         # Testing with locally build images
         # imagePullPolicy: Never

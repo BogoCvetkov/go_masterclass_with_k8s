@@ -1,18 +1,16 @@
-# Go Masterclass
+# About the project
 
-Go Masterclass is a comprehensive project that explores the various aspects of building web servers in Go. It aims to gain a deeper insight into the different types of web servers, their functionalities, advantages, and disadvantages. The project covers topics such as **server architecture**, **authentication mechanisms**, **gRPC implementation**, **gRPC gateway**, **asynchronous task execution**, **database interactions**, **CI/CD**, **Kubernetes orchestration**
+ A comprehensive project that explores the various aspects of building web servers in Go. Through this endeavour, I aimed to gain a deeper insight into the different types of web servers, their functionalities, advantages, and disadvantages. In order to feel more real and practical the project simulates a simplified banking application and covers topics such as:
+ -  **server architecture**, **authentication mechanisms**, **gRPC implementation**, **gRPC gateway**, **asynchronous task execution**, **database interactions**, **CI/CD**, **Kubernetes orchestration**
 
 ## Table of Contents
 
-- [Introduction](#introduction)
 - [Features](#features)
 - [Installation](#installation)
 
-## Introduction
-
-Go Masterclass is a project developed in Go that provides an in-depth exploration of web server development. Through this project, I aimed to gain a thorough understanding of various server types, their functioning, and their pros and cons. The project covers multiple aspects, outlined below.
-
 ## Features
+This is a list of topics that were the main focus of development, comparison and analysis:
+
 
 - **HTTP Server Development with Gin Framework**: A fully-functional HTTP server using the popular Gin Framework. To demonstrate real-world applicability, this server simulates a simplified bank application, complete with user management, transaction handling, and bank account management.
     - code location -> **/api folder**
@@ -28,10 +26,10 @@ Go Masterclass is a project developed in Go that provides an in-depth exploratio
     - code location -> **/grpc + /proto folder**
 
 - **Asynchronous Task Execution**: Integrated asynchronous email sending using Redis Queue and the asynq library. Set up a separate server for processing queued tasks and utilize mailhog as development SMTP server.
-    - code location -> **/async**
+    - code location -> **/async folder**
 
 - **Database Interactions with Postgres**: Using Postgres as the database layer and leverage tools like sqlc for auto-generating Go code from SQL definitions. Handle database migrations using golang-migrate and implement database transactions for safe fund transfers and user creation.
-    - code location -> **/db**
+    - code location -> **/db folder**
 
 - **Docker Containers for Easy Deployment**: Simplify deployment by leveraging Docker containers. The project utilizes three containers to streamline the setup: one for the API, another for the Redis Workers responsible for asynchronous task processing, and a third for handling database migrations.
 
